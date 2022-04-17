@@ -2,7 +2,7 @@ from random import randint
 
 class ElementGrille:
     def __init__(self):
-        self.type = randint(1,7)
+        self.type = randint(1,6)
     def __str__(self):
         return  str(self.type)
     def __repr__(self):
@@ -14,7 +14,7 @@ class Grille:
     def __init__(self):
         grid_bool = True
         while grid_bool:
-            self.grille = [[ElementGrille() for y in range(1,9)] for i in range(1,9)]
+            self.grille = [[ElementGrille() for y in range(1,7)] for i in range(1,7)]
             self.visited = [[0 for j in range(len(self.grille))] for i in range(len(self.grille))]
     def initGrille(self):
         for i in range(len(self.grille)):

@@ -13,16 +13,16 @@ class CandyCrush(QtWidgets.QMainWindow):
             4: 'CandyCrushImages/4.png',
             5: 'CandyCrushImages/5.png',
             6: 'CandyCrushImages/6.png',
-            7: 'CandyCrushImages/7.png',
-            8: 'CandyCrushImages/8.png',
         }
-        self.grille = [[ElementGrille() for y in range(1, 8)] for i in range(1, 8)]
+        self.grille = [[ElementGrille() for y in range(1, 7)] for i in range(1, 7)]
         # for i in range(len(self.grille)):
         #     for y in range(len(self.grille)):
         #         print(self.grille[i][y],sep=' ', end= ' ')
         #     print()
         self.button = [[QtWidgets.QPushButton('', self) for y in range(len(self.grille))] for i in
                        range(len(self.grille))]
+        self.visited = [[0 for y in range(len(self.grille))] for i in range(len(self.grille))]
+        print(self.visited)
         self.setupUI()
         self.click = []
     def setupUI(self):
@@ -63,6 +63,7 @@ class CandyCrush(QtWidgets.QMainWindow):
             self.click.append(index)
         elif len(self.click) == 1:
             self.click.append(index)
+            self.moveButton(self.click[0][0],self.click[0][1],self.click[1][0],self.click[1][1])
             self.refreshGrille()
         else:
             self.click = []
@@ -72,6 +73,39 @@ class CandyCrush(QtWidgets.QMainWindow):
             for y in range(len(self.grille)):
                 self.button[i][y].setText("")
                 self.setIcon(i,y)
+
+    def refreshVisited(self):
+        self.visited = [[0 for y in range(len(self.grille))] for i in range(len(self.grille))]
+    def moveButton(self,i,j,k,l):
+        self.invert(i,j,k,l)
+        index = [i,j,k,l]
+        self.action(index[0],index[1])
+        print(self.visited)
+    def invert(self,i,j,k,l):
+        if abs(i-k) + abs(j - l) == 1:
+            tmp = self.getItem(i,j)
+            self.setItem(i,j, self.getItem(k,l))
+            self.setItem(k,l,tmp)
+    def setItem(self,i,j,value):
+        self.grille[i][j].type = value
+    def flood(self,i,j,value):
+        if 0 <= i and i < 7 and 0 <= j and j < 7:
+            if self.getItem(i,j) == value and self.visited[i][j] == 0:
+                self.visited[i][j] = 1
+                self.flood(i+1,j,value)
+                self.flood(i-1,j,value)
+                self.flood(i,j+1,value)
+                self.flood(i,j-1,value)
+
+    def action(self,i,j):
+        self.refreshVisited()
+        self.flood(i,j,self.getItem(i,j))
+    def match3(self,i,j):
+        sumI, sumY = 0,0
+        for p in range(len(self.visited)):
+            sumI += self.visited[i][p]
+            sumY += self.visited[p][j]
+        return sumI > 2 or sumY > 2
 def main():
     app = QtWidgets.QApplication(sys.argv)
     ex = CandyCrush()
